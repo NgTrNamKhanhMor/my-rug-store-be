@@ -12,7 +12,10 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBasicAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('products') // Groups these endpoints in the UI
+@ApiBasicAuth()
 @UseGuards(AuthGuard('basic'))
 @Controller('products')
 export class ProductsController {
