@@ -4,9 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AuthModule } from './auth/auth.module';
-import { Product } from './products/entities/product.entity';
-import { Category } from './categories/entities/category.entity';
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,7 +14,6 @@ import { Category } from './categories/entities/category.entity';
       password: 'Namkhanh@2510',
       database: 'my_nest_db',
       autoLoadEntities: true,
-      entities: [Product, Category],
       synchronize: true,
     }),
     ProductsModule,

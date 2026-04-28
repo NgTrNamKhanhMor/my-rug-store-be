@@ -1,29 +1,46 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsArray,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty({ example: 'Vintage Hanoi Wool Rug' })
-  @IsString() // Changed from @isString() to @IsString()
-  @IsNotEmpty({ message: 'The name field is required and cannot be empty' })
+  @IsString()
+  @IsNotEmpty()
   name!: string;
 
-  @ApiProperty({ example: 'Hand-woven with traditional patterns' })
-  @IsString()
-  @IsOptional()
-  description?: string;
+  @ApiProperty({ example: 1 })
+  @IsNumber()
+  @IsNotEmpty()
+  categoryId!: number;
 
   @ApiProperty({ example: 250.5 })
   @IsNumber()
   @IsNotEmpty()
   price!: number;
 
-  @ApiProperty({ example: 5 })
-  @IsNumber()
+  @ApiProperty({ example: 'https://cdn.sonstudio.vn/rug-01.jpg' })
+  @IsString()
   @IsNotEmpty()
-  stock!: number;
+  @IsUrl()
+  image!: string;
 
-  @ApiProperty({ example: 1 })
-  @IsNumber()
-  @IsNotEmpty()
-  categoryId!: number;
+  @ApiPropertyOptional({ example: 'Hand-woven with traditional patterns' })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiPropertyOptional({
+    example: ['100% Wool', 'Hand-dyed', 'Made in Hanoi'],
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  details?: string[];
 }

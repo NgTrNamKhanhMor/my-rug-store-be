@@ -15,22 +15,22 @@ export class Product {
   @Column()
   name!: string;
 
-  @Column({ type: 'text', nullable: true })
-  description!: string;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price!: number;
-
-  @Column({ default: 0 })
-  stock!: number;
-
-  @Column({ nullable: true })
-  imageUrl!: string;
-
   @Column()
   categoryId!: number;
 
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'categoryId' })
   category!: Category;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price!: number;
+
+  @Column()
+  image!: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
+
+  @Column({ type: 'json', nullable: true })
+  details?: string[];
 }

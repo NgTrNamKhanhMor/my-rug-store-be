@@ -6,59 +6,68 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { Product } from './entities/product.entity';
 
-@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new rug' })
-  @ApiResponse({
-    status: 201,
-    description: 'Product created successfully.',
-    type: Product,
-  })
-  create(@Body() createProductDto: CreateProductDto): Promise<Product> {
-    return this.productsService.create(createProductDto);
-  }
+  // ======================================================
+  // SECTION: PUBLIC (Storefront)
+  // ======================================================
 
+  @ApiTags('Storefront') // This groups the GET requests together
   @Get()
-  @ApiOperation({ summary: 'List all rugs' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return all products.',
-    type: [Product],
-  })
-  findAll(): Promise<Product[]> {
+  @ApiOperation({ summary: 'Get all products for the rug shop' })
+  findAll() {
     return this.productsService.findAll();
   }
 
+  @ApiTags('Storefront')
   @Get(':id')
-  @ApiOperation({ summary: 'Get rug details by ID' })
-  @ApiParam({ name: 'id', description: 'The unique ID of the rug' })
-  findOne(@Param('id') id: string): Promise<Product> {
-    return this.productsService.findOne(+id);
+  @ApiOperation({ summary: 'Get product details by ID' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findOne(id);
   }
 
+  // ======================================================
+  // SECTION: ADMIN (Inventory Management)
+  // ======================================================
+
+  @ApiTags('Inventory Management') // This groups the CRUD actions together
+  @ApiBearerAuth() // Adds the "lock" icon in Swagger for these routes
+  @UseGuards(AuthGuard('jwt'))
+  @Post()
+  @ApiOperation({ summary: 'Create a new product (Admin Only)' })
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productsService.create(createProductDto);
+  }
+
+  @ApiTags('Inventory Management')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
-  @ApiOperation({ summary: 'Update rug information' })
+  @ApiOperation({ summary: 'Update product information (Admin Only)' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    return this.productsService.update(+id, updateProductDto);
+  ) {
+    return this.productsService.update(id, updateProductDto);
   }
 
+  @ApiTags('Inventory Management')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a rug from inventory' })
-  remove(@Param('id') id: string): Promise<Product> {
-    return this.productsService.remove(+id);
+  @ApiOperation({ summary: 'Remove a product from stock (Admin Only)' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.remove(id);
   }
 }
